@@ -26,14 +26,6 @@ import os
 # Sets up the web driver
 os.environ['PATH']
 
-
-"""
-    To do
-     - on the new page, scrape for the returned deals 
-        - data we need is: name, price, speed, set up cost, contract length
-     - return the above 
-     - neatly refactor into functions
-"""
 # Test postcode here was one of the few I managed to find that actually returned a result available to be processed
 postcode = "SW1V 1AG"
 
@@ -43,13 +35,10 @@ with webdriver.Chrome() as driver:
 
     # Grab input field
     search = driver.find_element(By.XPATH, '//*[@id="block_5d417545412ba"]/div/div[1]/div/div/div[1]/div/div/input')
-    print(type(search))
-    print(search)
 
     #  Go away cookie notification
     cookies = driver.find_element(By.CLASS_NAME, "modal-button")
     cookies.click()
-
 
     # Select the search bar, pass in postcode and generate the dropdown
     search.click()
@@ -62,30 +51,63 @@ with webdriver.Chrome() as driver:
     dropdown = driver.find_element(By.CLASS_NAME, "elastic-results-container")
     print('page loaded')
 
-    time.sleep(15)
-    # dropdown_locator = '//*[@id="elastic-results"]/div[2]/div[1]'
-    # dropdown_wait = WebDriverWait(driver, 10).until(
-    #     EC.presence_of_element_located(dropdown_locator))
+    # Wait until dropdown loads
+    dropdown_wait = WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="elastic-results"]/div[2]/div[1]'))
+    )
+    # Select dropdown element
     dropdown_item = driver.find_element(By.XPATH, '//*[@id="elastic-results"]/div[2]/div[1]')
     dropdown_item.click()
     print('dropdown item selected')
-    time.sleep(3)
+    # Wait for button to be clickable
+    WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="block_5d417545412ba"]/div/div[1]/div/div/div[1]/div/div/button'))
+    )
     search_button = driver.find_element(By.XPATH,
                                         '//*[@id="block_5d417545412ba"]/div/div[1]/div/div/div[1]/div/div/button')
     search_button.click()
-
-    time.sleep(10)
 
     # Selecting the content blocks for each price structure
     parent_node = WebDriverWait(driver, 10).until(
                             lambda br: br.find_elements(By.CLASS_NAME, 'package-col'))
     print(parent_node[0])
+
     # Get the child elements from this
-
     children = parent_node[0].find_elements(By.XPATH, './*')
-    # Iterate over them to pull out data
-    for child in children:
-        print(type(child))
-        print("<%s> %r" % (child.tag_name, child.text))
 
-    time.sleep(3)
+    # Set up base list
+    names = ["fast", "superfast", "ultrafast", "hyperfast"]
+    # Iterate over child nodes to pull out data
+    for child in children:
+        speeds = driver.find_elements(By.CLASS_NAME, "size-unit")
+        costs = driver.find_elements(By.CLASS_NAME, "price")
+        contracts = driver.find_elements(By.CLASS_NAME, "promotion-months")
+        upfronts_web = driver.find_elements(By.CLASS_NAME, "description")
+
+    '''
+        loop over the length of all the lists and sanitise data in various ways
+        string formatting for the upfront costs
+        converting web objects into strings for others
+    '''
+    upfronts = []
+    for num in range(0, len(names)):
+        sanitised_num = f"£{upfronts_web[num].text.split('£')[1].split('and')[0]}"
+        upfronts.insert(num, sanitised_num)
+        speeds[num] = speeds[num].text
+        costs[num] = costs[num].text
+        contracts[num] = contracts[num].text
+
+    # Package data into a dictionary ready to convert to a dataframe
+    data = {
+        'name': names,
+        'speed': speeds,
+        'monthly_cost': costs,
+        'contract_length': contracts,
+        'upfront': upfronts}
+    df = pd.DataFrame(data)
+    print(df)
+
+    # Query user for a desired filename and save information to userinput_.csv
+    file_name = input("Please enter the name you'd like to call the CSV file of your output: ")
+    df.to_csv(f'{file_name}_.csv')
+

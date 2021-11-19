@@ -17,7 +17,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, NoSuchFrameException
 import time
 from pathlib import Path
 import pandas as pd
@@ -33,7 +33,8 @@ with webdriver.Chrome() as driver:
     driver.get('https://www.bt.com/products/broadband/deals')
 
     # Get rid of cookies dialog box
-    time.sleep(10)     # I wanted to avoid using sleeps as much as possible but for switching to an iframe i wasn't sure how to implement a WebDriverWait to accomplish the same effect
+    time.sleep(10)
+    # There is some inconsistencies with how this runs, unsure why as of now, using WebDriverWait didn't fix
     driver.switch_to.frame(0)
     driver.find_element(By.CLASS_NAME, "call").click()
     driver.switch_to.default_content()
