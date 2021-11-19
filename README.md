@@ -18,6 +18,7 @@ what the issue is. It seems to have trouble occasionally switching to the cookie
 the button to click. If you do experience this issue, please just re-run the script once or twice, it should work.
 
 **Notes on running the files**
+
 To run this, please generate a virtualenv using the requirements.txt file, then run each script individually.
 At the end of each script you will be prompted in the terminal to provide name for the ouput CSV file for the scraping results.
 If you wish to test for a different postcode you'll need to change the postcode variable in each file. I was hoping longer term to broaden this
