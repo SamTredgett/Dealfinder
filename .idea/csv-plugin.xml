@@ -3,14 +3,14 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="\bt.csv">
+        <entry key="\bt_.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\new_output_bt.csv">
+        <entry key="\hyperoptic_.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

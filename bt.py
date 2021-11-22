@@ -35,7 +35,7 @@ with webdriver.Chrome() as driver:
     # Get rid of cookies dialog box
     time.sleep(10)
     # There is some inconsistencies with how this runs, unsure why as of now, using WebDriverWait didn't fix
-    driver.switch_to.frame(0)
+    driver.switch_to.frame(1)
     driver.find_element(By.CLASS_NAME, "call").click()
     driver.switch_to.default_content()
 
